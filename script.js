@@ -9,15 +9,14 @@ Promise.all([
 
 async function start() {
     const load = document.querySelector(".alert");
-    load.style.display = "none";
+    load.textContent = "Almost Finish..."
     const container = document.querySelector(".image");
     container.style.position = 'relative'
     const labeledFaceDescriptors = await loadLabeledImages()
     const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6)
+    load.style.display = "none";
     let image
     let canvas
-    const alert = document.querySelector('.alert');
-    alert.textContent = "Loaded";
     imageUpload.addEventListener('change', async () => {
         if (image) image.remove()
         if (canvas) canvas.remove()
@@ -29,19 +28,14 @@ async function start() {
         faceapi.matchDimensions(canvas, displaySize)
         const detections = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
         const resizedDetections = faceapi.resizeResults(detections, displaySize)
-        const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor))
-        
-        console.log(results[2]);
-        console.log(results[0]._label);   
+        const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor))  
         results.forEach((result, i) => {
             erpNumbers += " "+(results[i]._label);
             const box = resizedDetections[i].detection.box
             const drawBox = new faceapi.draw.DrawBox(box, { label: result.toString() })
             drawBox.draw(canvas)
         })
-        console.log(erpNumbers);
         let presentList = erpNumbers.split(' ');
-        console.log(presentList);
         present.value = presentList.sort();
     })
 }
