@@ -8,14 +8,16 @@ Promise.all([
 ]).then(start)
 
 async function start() {
-    const container = document.createElement('div')
+    const load = document.querySelector(".alert");
+    load.style.display = "none";
+    const container = document.querySelector(".image");
     container.style.position = 'relative'
-    document.body.append(container)
     const labeledFaceDescriptors = await loadLabeledImages()
     const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6)
     let image
     let canvas
-    document.body.append('Loaded')
+    const alert = document.querySelector('.alert');
+    alert.textContent = "Loaded";
     imageUpload.addEventListener('change', async () => {
         if (image) image.remove()
         if (canvas) canvas.remove()
@@ -38,7 +40,9 @@ async function start() {
             drawBox.draw(canvas)
         })
         console.log(erpNumbers);
-        present.value = erpNumbers;
+        let presentList = erpNumbers.split(' ');
+        console.log(presentList);
+        present.value = presentList.sort();
     })
 }
 
@@ -52,7 +56,6 @@ function loadLabeledImages() {
                 const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
                 descriptions.push(detections.descriptor)
             }
-
             return new faceapi.LabeledFaceDescriptors(label, descriptions)
         })
     )
